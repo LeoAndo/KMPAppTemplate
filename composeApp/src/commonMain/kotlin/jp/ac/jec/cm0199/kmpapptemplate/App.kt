@@ -10,6 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
@@ -22,16 +23,23 @@ import kmpapptemplate.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
+        // 再構成および構成の変更後も UI のトグルとカウンターを維持する
+        var showContent by rememberSaveable { mutableStateOf(false) }
+        var count by rememberSaveable { mutableStateOf(0) }
         Column(
             modifier = Modifier
                 .safeContentPadding()
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(onClick = { showContent = !showContent }) {
+            Text("count: $count")
+            Button(onClick = {
+                showContent = !showContent
+                count++
+            }) {
                 Text("Click me!")
             }
+            // 切り替えるとプラットフォーム固有の挨拶が表示される
             AnimatedVisibility(showContent) {
                 val greeting = Greeting().greet()
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
