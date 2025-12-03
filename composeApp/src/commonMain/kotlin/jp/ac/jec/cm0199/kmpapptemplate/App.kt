@@ -36,7 +36,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    AppTheme {
         // クイズの進行・通知・スクロール状態を Compose スコープ内で保持する。
         val hostState = remember { SnackbarHostState() }
         val pagerState =
