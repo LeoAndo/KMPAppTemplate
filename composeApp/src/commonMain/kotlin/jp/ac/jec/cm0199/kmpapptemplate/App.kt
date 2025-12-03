@@ -40,7 +40,7 @@ fun App() {
         // クイズの進行・通知・スクロール状態を Compose スコープ内で保持する。
         val hostState = remember { SnackbarHostState() }
         val pagerState =
-            rememberPagerState(pageCount = { Question.entries.size }) // TODO 仮で10を指定。あとで変更する
+            rememberPagerState(pageCount = { Question.entries.size })
         val scope = rememberCoroutineScope()
         val scrollState = rememberScrollState()
         var isFinishedQuiz by remember { mutableStateOf(false) }
@@ -75,9 +75,9 @@ fun App() {
                                 .padding(12.dp), // 文字の周りに余白を追加する
                             contentAlignment = Alignment.Center
                         ) {
-                            val message = Question.entries.first { it.ordinal == pageIndex }.message
+                            val message = Question.entries[pageIndex].message
                             Text(
-                                text = message, // TODO 仮でテキストにページインデックスを表示する
+                                text = message,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
@@ -98,8 +98,7 @@ fun App() {
                     }
                 }
 
-                val question = Question.entries
-                    .first { question -> question.ordinal == pagerState.currentPage }
+                val question = Question.entries[pagerState.currentPage]
                 question.answers.forEachIndexed { index, answerText ->
                     // 選択肢ボタン: 正誤判定しスナックバー表示後、必要に応じて次ページへ遷移。
                     Button(
@@ -107,19 +106,19 @@ fun App() {
                         modifier = Modifier.widthIn(max = 320.dp).fillMaxWidth(0.5f),
                         onClick = {
                             scope.launch {
-                                isFinishedQuiz =
-                                    Question.entries.size <= pagerState.currentPage + 1
+                                isFinishedQuiz = pagerState.currentPage + 1 == Question.entries.size
                                 if (!isFinishedQuiz) {
                                     pagerState.scrollToPage(page = pagerState.currentPage + 1)
                                 }
-                                val message = if (question.answerIndex == index) {
+                                val isCorrect = question.answerIndex == index
+                                if (isCorrect) {
                                     collectAnswerCount++
-                                    "正解です！"
-                                } else {
-                                    "不正解です！"
                                 }
+                                val message = if (isCorrect) "正解です！" else "不正解です！"
+
                                 hostState.currentSnackbarData?.dismiss()
                                 hostState.showSnackbar(message)
+
                             }
                         },
                     ) {
